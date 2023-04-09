@@ -1,2 +1,2 @@
 # Aim-game
-Simple aim game
+>Simple aim game
