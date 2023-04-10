@@ -12,6 +12,7 @@ const CIRCLE_COLORS = [
 const screens = document.querySelectorAll('.screen');
 const startBtn = document.querySelector('#start');
 const timeList = document.querySelector('#time-list');
+const timerBlock = document.querySelector('.timer');
 const timer = document.querySelector('#time');
 const board = document.querySelector('#board');
 
@@ -38,24 +39,14 @@ const createRandomCircle = () => {
   circle.style.left = `${y}px`;
   circle.style.width = `${size}px`;
   circle.style.height = `${size}px`;
-  console.log(getRandomArrayElement(CIRCLE_COLORS))
   circle.style.background = getRandomArrayElement(CIRCLE_COLORS);
 
   board.append(circle);
-}
-
-const finishGame = () => {
-  timer.parentNode.remove();
-  board.innerHTML = `<h1>Счёт: <span class="primary">${score}</span</h1>`;
-
-  setTimeout(() => {
-    screens.forEach((screen) => screen.classList.remove('up'));
-  }, 3000);
-}
+};
 
 const setTime = (value) => {
   timer.innerText = `00:${value}`;
-}
+};
 
 const decreaseTime = () => {
   if (time === 0) {
@@ -67,13 +58,27 @@ const decreaseTime = () => {
     }
     setTime(current);
   }
-}
+};
 
+let intervalId;
 const startGame = () => {
-  setInterval(decreaseTime, INTERVAL_TIMEOUT);
+  board.innerHTML = ''
+  score = 0;
+  intervalId = setInterval(decreaseTime, INTERVAL_TIMEOUT);
   createRandomCircle();
+  timerBlock.classList.remove('hidden');
   setTime(time);
-}
+};
+
+const finishGame = () => {
+  clearInterval(intervalId);
+  timerBlock.classList.add('hidden');
+  board.innerHTML = `<h1>Счёт: <span class="primary">${score}</span</h1>`;
+
+  setTimeout(() => {
+    screens.forEach((screen) => screen.classList.remove('up'));
+  }, 3000);
+};
 
 startBtn.addEventListener('click', (evt) => {
   evt.preventDefault();
@@ -86,7 +91,7 @@ timeList.addEventListener('click', (evt) => {
     screens[1].classList.add('up');
     startGame();
   }
-})
+});
 
 board.addEventListener('click', (evt) => {
   if (evt.target.classList.contains('circle')) {
@@ -94,4 +99,4 @@ board.addEventListener('click', (evt) => {
     evt.target.remove();
     createRandomCircle();
   }
-})
+});

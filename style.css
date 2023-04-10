@@ -73,7 +73,11 @@ h1 {
 	color: #16d9e3;
 }
 
-.hide {
+.timer {
+	transition: opacity 0.1s linear;
+}
+
+.hidden {
 	opacity: 0;
 }
 
