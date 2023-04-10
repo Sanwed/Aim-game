@@ -10,6 +10,8 @@ const CIRCLE_COLORS = [
 ];
 
 const screens = document.querySelectorAll('.screen');
+const menuScreen = document.querySelector('#menu-screen');
+const levelChangeScreen = document.querySelector('#level-change-screen');
 const startBtn = document.querySelector('#start');
 const timeList = document.querySelector('#time-list');
 const timerBlock = document.querySelector('.timer');
@@ -18,6 +20,7 @@ const board = document.querySelector('#board');
 
 let time = 0;
 let score = 0;
+let missClicks = 0;
 
 const getRandomNumber = (min, max) => {
   min = Math.ceil(min);
@@ -44,10 +47,6 @@ const createRandomCircle = () => {
   board.append(circle);
 };
 
-const setTime = (value) => {
-  timer.innerText = `00:${value}`;
-};
-
 const decreaseTime = () => {
   if (time === 0) {
     finishGame();
@@ -56,25 +55,28 @@ const decreaseTime = () => {
     if (current < 10) {
       current = `0${current}`;
     }
-    setTime(current);
+    timer.innerText = `00:${current}`;
   }
 };
 
 let intervalId;
 const startGame = () => {
-  board.innerHTML = ''
+  board.innerHTML = '';
+  timerBlock.classList.remove('hidden');
   score = 0;
+  missClicks = 0;
+
+  timer.innerText = `00:${time}`;
   intervalId = setInterval(decreaseTime, INTERVAL_TIMEOUT);
   createRandomCircle();
-  timerBlock.classList.remove('hidden');
-  setTime(time);
 };
 
 const finishGame = () => {
-  clearInterval(intervalId);
   timerBlock.classList.add('hidden');
-  board.innerHTML = `<h1>Счёт: <span class="primary">${score}</span</h1>`;
+  board.innerHTML = `<h1>Счёт: <span class="primary">${score}</span></h1>
+                     <h1>Промахи: <span class="primary">${missClicks}</span></h1`;
 
+  clearInterval(intervalId);
   setTimeout(() => {
     screens.forEach((screen) => screen.classList.remove('up'));
   }, 3000);
@@ -82,13 +84,13 @@ const finishGame = () => {
 
 startBtn.addEventListener('click', (evt) => {
   evt.preventDefault();
-  screens[0].classList.add('up');
+  menuScreen.classList.add('up');
 });
 
 timeList.addEventListener('click', (evt) => {
   if (evt.target.classList.contains('time-btn')) {
     time = parseInt(evt.target.dataset.time);
-    screens[1].classList.add('up');
+    levelChangeScreen.classList.add('up');
     startGame();
   }
 });
@@ -98,5 +100,7 @@ board.addEventListener('click', (evt) => {
     score++;
     evt.target.remove();
     createRandomCircle();
+  } else {
+    missClicks++;
   }
 });
