@@ -1,4 +1,5 @@
 const INTERVAL_TIMEOUT = 1000;
+const CIRCLE_DISAPPEAR_TIME = 1000;
 const MIN_CIRCLE_SIZE = 10;
 const MAX_CIRCLE_SIZE = 60;
 const CIRCLE_COLORS = [
@@ -17,6 +18,7 @@ const timeList = document.querySelector('#time-list');
 const timerBlock = document.querySelector('.timer');
 const timer = document.querySelector('#time');
 const board = document.querySelector('#board');
+const modeInput = document.querySelector('#no-misses');
 
 let time = 0;
 let score = 0;
@@ -47,6 +49,11 @@ const createRandomCircle = () => {
   board.append(circle);
 };
 
+const removeCircle = () => {
+  const circle = document.querySelector('.circle');
+  circle.remove();
+}
+
 const decreaseTime = () => {
   if (time === 0) {
     finishGame();
@@ -60,15 +67,22 @@ const decreaseTime = () => {
 };
 
 let intervalId;
+let circleRemove;
 const startGame = () => {
   board.innerHTML = '';
   timerBlock.classList.remove('hidden');
   score = 0;
   missClicks = 0;
 
+  createRandomCircle();
+  circleRemove = setInterval(() => {
+    removeCircle();
+    createRandomCircle();
+    missClicks++;
+  }, CIRCLE_DISAPPEAR_TIME);
   timer.innerText = `00:${time}`;
   intervalId = setInterval(decreaseTime, INTERVAL_TIMEOUT);
-  createRandomCircle();
+
 };
 
 const finishGame = () => {
@@ -77,6 +91,7 @@ const finishGame = () => {
                      <h1>Промахи: <span class="primary">${missClicks}</span></h1`;
 
   clearInterval(intervalId);
+  clearInterval(circleRemove);
   setTimeout(() => {
     screens.forEach((screen) => screen.classList.remove('up'));
   }, 3000);
@@ -97,10 +112,19 @@ timeList.addEventListener('click', (evt) => {
 
 board.addEventListener('click', (evt) => {
   if (evt.target.classList.contains('circle')) {
+    clearInterval(circleRemove);
+    circleRemove = setInterval(() => {
+      removeCircle();
+      createRandomCircle();
+      missClicks++;
+    }, CIRCLE_DISAPPEAR_TIME);
     score++;
-    evt.target.remove();
+    removeCircle();
     createRandomCircle();
   } else {
     missClicks++;
+    if (modeInput.checked) {
+      finishGame();
+    }
   }
 });
