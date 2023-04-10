@@ -80,9 +80,15 @@ const startGame = () => {
     createRandomCircle();
     missClicks++;
   }, CIRCLE_DISAPPEAR_TIME);
-  timer.innerText = `00:${time}`;
-  intervalId = setInterval(decreaseTime, INTERVAL_TIMEOUT);
 
+  if (time === 60) {
+    timer.innerText = `01:00`;
+
+  } else {
+    timer.innerText = `00:${time}`;
+  }
+
+  intervalId = setInterval(decreaseTime, INTERVAL_TIMEOUT);
 };
 
 const finishGame = () => {
