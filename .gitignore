@@ -1,3 +1,4 @@
 .DS_STORE
 .idea
 Thumbs.db
+node_modules/
