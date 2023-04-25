@@ -1,3 +1,5 @@
+import {getRandomArrayElement, getRandomNumber} from "./utils.js";
+
 const INTERVAL_TIMEOUT = 1000;
 const MIN_CIRCLE_SIZE = 10;
 const MAX_CIRCLE_SIZE = 60;
@@ -11,40 +13,13 @@ const CIRCLE_COLORS = [
 const MIN_USERNAME_LENGTH = 3;
 const MAX_USERNAME_LENGTH = 20;
 
-const screens = document.querySelectorAll('.screen');
-const menuScreen = document.querySelector('#menu-screen');
-const settingsScreen = document.querySelector('#level-settings-screen');
-const startBtn = document.querySelector('#start');
-const timeList = document.querySelector('#time-list');
-const timerBlock = document.querySelector('.timer');
 const timer = document.querySelector('#time');
 const board = document.querySelector('#board');
-const modeInput = document.querySelector('#no-misses');
-const speedRange = document.querySelector('.range-speed');
-const speedValue = document.querySelector('.range-speed-value');
-
-const leaderboardList = document.querySelector('.leaderboard__list');
-const nameInput = document.querySelector('#name');
 
 let time = 0;
 let score = 0;
 let missClicks = 0;
-
 let circleDisappearTime = 1000;
-speedValue.textContent = speedRange.value;
-
-speedRange.addEventListener('change', () => {
-  circleDisappearTime = speedRange.value;
-  speedValue.textContent = speedRange.value;
-})
-
-const getRandomNumber = (min, max) => {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1) + min);
-};
-
-const getRandomArrayElement = (array) => array[getRandomNumber(0, array.length - 1)];
 
 const createRandomCircle = () => {
   const circle = document.createElement('div');
@@ -80,6 +55,7 @@ const decreaseTime = () => {
   }
 };
 
+const modeInput = document.querySelector('#no-misses');
 const handleMissClick = () => {
   removeCircle();
   createRandomCircle();
@@ -112,35 +88,49 @@ const startGame = () => {
 };
 
 const scores = [];
-
+const nameInput = document.querySelector('#name');
+const leaderboardList = document.querySelector('.leaderboard__list');
 const addToLeaderboard = () => {
   leaderboardList.innerHTML = '';
 
-  scores.push({
-    name: nameInput.value,
-    points: score
-  });
+  if (scores.some(({name, points}) => {
+    if (name === nameInput.value && score > points) {
+      return true;
+    }
+  })) {
+    const existingNameIndex = scores.findIndex(({name}) => name === nameInput.value);
+    scores.splice(existingNameIndex, 1);
+  } else if (scores.some(({name}) => name === nameInput.value)) {
+    scores.push({
+      name: nameInput.value,
+      points: score
+    });
+    scores.pop();
+  } else {
+    scores.push({
+      name: nameInput.value,
+      points: score
+    });
+  }
 
-  const sortedScores = scores.sort((a, b) => b.points - a.points);
-
+  const sortedScores = scores.sort((a, b) => b.points - a.points).slice(0, 10);
   sortedScores.forEach((score) => {
     const leaderboardItem = document.createElement('li');
     leaderboardItem.classList.add('leaderboard__item');
-    leaderboardItem.innerHTML = `<span class="leaderboard__name">${score.name}</span>`
+    leaderboardItem.innerHTML = `<span class="leaderboard__name">${score.name}</span>
+    <span class="leaderboard__score">${score.points}</span>`;
     leaderboardList.append(leaderboardItem);
   })
-}
+};
 
+const screens = document.querySelectorAll('.screen');
+const timerBlock = document.querySelector('.timer');
 const finishGame = () => {
-  if (modeInput.checked && missClicks === 0) {
-    addToLeaderboard();
-    nameInput.value = '';
-  }
-
+  addToLeaderboard();
+  nameInput.value = '';
   timerBlock.classList.add('hidden');
   board.innerHTML = `<h1>Счёт: <span class="primary">${score}</span></h1>
                      <h1>Промахи: <span class="primary">${missClicks}</span></h1`;
-
   clearInterval(intervalId);
   clearInterval(circleRemove);
   setTimeout(() => {
@@ -148,28 +138,34 @@ const finishGame = () => {
   }, 3000);
 };
 
-startBtn.addEventListener('click', (evt) => {
-  evt.preventDefault();
-  menuScreen.classList.add('up');
-});
-
 const isUsernameCorrect = () => nameInput.value !== '' &&
   nameInput.value.length >= MIN_USERNAME_LENGTH &&
   nameInput.value.length <= MAX_USERNAME_LENGTH &&
   !scores.some(({name}) => name === nameInput.value);
 
+const startBtn = document.querySelector('#start');
+startBtn.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  const menuScreen = document.querySelector('#menu-screen');
+  menuScreen.classList.add('up');
+});
+
+const timeList = document.querySelector('#time-list');
+const errorElement = document.querySelector('.error-text');
 timeList.addEventListener('click', (evt) => {
   if (evt.target.classList.contains('time-btn')) {
-    if (isUsernameCorrect()) {
+    if (nameInput.value === '') {
+      errorElement.textContent = 'Поле с именем должно быть заполнено';
+    } else if (nameInput.value.length <= MIN_USERNAME_LENGTH) {
+      errorElement.textContent = `Имя должно быть длиннее ${MIN_USERNAME_LENGTH} символов`;
+    } else if (nameInput.value.length >= MAX_USERNAME_LENGTH) {
+      errorElement.textContent = `Имя должно быть короче ${MAX_USERNAME_LENGTH} символов`;
+    } else {
+      errorElement.textContent = '';
+      const settingsScreen = document.querySelector('#level-settings-screen');
       time = parseInt(evt.target.dataset.time);
       settingsScreen.classList.add('up');
       startGame();
-    } else {
-      // errorMessage.classList.remove('hidden');
-
-      // setTimeout(() => {
-      //   errorMessage.classList.add('hidden');
-      // }, 3000);
     }
   }
 });
@@ -184,4 +180,13 @@ board.addEventListener('click', (evt) => {
   } else {
     missClicks++;
   }
+});
+
+const speedRange = document.querySelector('.range-speed');
+const speedValue = document.querySelector('.range-speed-value');
+speedValue.textContent = speedRange.value;
+
+speedRange.addEventListener('change', () => {
+  circleDisappearTime = speedRange.value;
+  speedValue.textContent = speedRange.value;
 });
