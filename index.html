@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="css/style.css">
 	<title>Simple Aim Game</title>
 </head>
 <body>
@@ -19,6 +19,26 @@
 
 <div class="screen" id="level-settings-screen">
 	<h1>Выберите время</h1>
+
+	<div class="mode">
+		<label>
+			<input class="mode__input visually-hidden" type="checkbox" id="no-misses" name="no-misses">
+			<span class="mode__text">Без промахов:</span>
+		</label>
+	</div>
+
+	<div class="range-bar">
+		<input type="range" class="range-speed" name="remove-speed" min="500" max="1500" step="50" value="1000">
+		<span class="range-speed-value"></span>
+	</div>
+
+	<div class="name">
+		<label>
+			<span>Введите имя: </span>
+			<input id="name" type="text" required autocomplete="off">
+		</label>
+	</div>
+
 	<ul class="time-list" id="time-list">
 		<li>
 			<button class="btn time-btn" data-time="15">15 сек</button>
@@ -33,25 +53,8 @@
 			<button class="btn time-btn" data-time="60">1 мин</button>
 		</li>
 	</ul>
-	
-	<div class="mode">
-		<label>
-			<span>Без промахов:</span>
-			<input type="checkbox" id="no-misses" name="no-misses">
-		</label>
-	</div>
-	
-	<div class="range-bar">
-		<input type="range" class="range-speed" name="remove-speed" min="500" max="1500" step="50" value="1000">
-		<span class="range-speed-value"></span>
-	</div>
 
-	<div class="name">
-		<label>
-			<span>Введите имя: </span>
-			<input id="name" type="text" required>
-		</label>
-	</div>
+	<span class="error-text"></span>
 </div>
 
 <div class="screen" id="play-screen">
@@ -59,6 +62,6 @@
 	<div class="board" id="board"></div>
 </div>
 
-<script src="game.js"></script>
+<script type="module" src="game.js"></script>
 </body>
 </html>
