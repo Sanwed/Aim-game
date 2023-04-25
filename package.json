@@ -4,7 +4,7 @@
   "description": ">Simple aim game",
   "main": "game.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "browser-sync start --server --no-ui --files \"js/**/*.js\" --files \"css/style.css\""
   },
   "repository": {
     "type": "git",
@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Sanyok133/Aim-game/issues"
   },
-  "homepage": "https://github.com/Sanyok133/Aim-game#readme"
+  "homepage": "https://github.com/Sanyok133/Aim-game#readme",
+  "devDependencies": {
+    "browser-sync": "2.29.1"
+  }
 }
