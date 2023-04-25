@@ -57,6 +57,7 @@ h1 {
 }
 
 .btn {
+	display: block;
 	background-color: transparent;
 	border: 2px solid #c0c0c0;
 	color: #fff;
@@ -111,7 +112,7 @@ h1 {
 .range-bar {
 	display: flex;
 	gap: 20px;
-	margin-bottom: 16px; 
+	margin-bottom: 16px;
 }
 
 .mode {
@@ -141,8 +142,71 @@ h1 {
 .leaderboard__item {
 	margin: 0 0 20px 20px;
 	text-align: left;
+	display: flex;
+	justify-content: space-between;
 }
 
-.leaderboard__item:last-child{
+.leaderboard__item:last-child {
 	margin: 0 0 0 20px;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	border: 0;
+	padding: 0;
+
+	white-space: nowrap;
+	clip-path: inset(100%);
+	clip: rect(0 0 0 0);
+	overflow: hidden;
+}
+
+.mode label {
+	display: block;
+	position: relative;
+	min-width: 200px;
+}
+
+.mode__text {
+	cursor: pointer;
+	font-size: 1.5rem;
+	display: flex;
+	gap: 15px;
+	align-items: center;
+}
+
+.mode__text::before {
+	position: absolute;
+	content: "";
+	right: 0;
+	display: block;
+	width: 20px;
+	height: 20px;
+	border: 2px solid #fff;
+}
+
+.mode__text::after {
+	content: "";
+	display: none;
+	width: 10px;
+	height: 10px;
+	right: calc(6% - 5px);
+	position: absolute;
+	border-radius: 50%;
+	background-color: #fff;
+}
+
+.mode__input:checked + .mode__text::after {
+	display: block;
+}
+
+.name {
+	margin-bottom: 24px;
+}
+
+.error-text {
+	font-size: 24px;
 }
