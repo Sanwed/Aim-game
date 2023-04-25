@@ -60,10 +60,6 @@ const handleMissClick = () => {
   removeCircle();
   createRandomCircle();
   missClicks++;
-
-  if (modeInput.checked && missClicks > 0) {
-    finishGame();
-  }
 }
 
 let intervalId;
@@ -174,6 +170,9 @@ board.addEventListener('click', (evt) => {
     createRandomCircle();
   } else {
     missClicks++;
+    if (modeInput.checked) {
+      finishGame();
+    }
   }
 });
 
