@@ -138,11 +138,6 @@ const finishGame = () => {
   }, 3000);
 };
 
-const isUsernameCorrect = () => nameInput.value !== '' &&
-  nameInput.value.length >= MIN_USERNAME_LENGTH &&
-  nameInput.value.length <= MAX_USERNAME_LENGTH &&
-  !scores.some(({name}) => name === nameInput.value);
-
 const startBtn = document.querySelector('#start');
 startBtn.addEventListener('click', (evt) => {
   evt.preventDefault();
