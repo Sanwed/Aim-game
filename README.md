@@ -1,5 +1,5 @@
 # Aim-game
->Simple aim game
+>Aim game
 
 >[PREVIEW](https://sanyok133.github.io/Aim-game/)
 
