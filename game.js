@@ -96,13 +96,11 @@ const addToLeaderboard = () => {
   })) {
     const existingNameIndex = scores.findIndex(({name}) => name === nameInput.value);
     scores.splice(existingNameIndex, 1);
-  } else if (scores.some(({name}) => name === nameInput.value)) {
     scores.push({
       name: nameInput.value,
       points: score
     });
-    scores.pop();
-  } else {
+  } else if (scores.every(({name}) => name !== nameInput.value)) {
     scores.push({
       name: nameInput.value,
       points: score
