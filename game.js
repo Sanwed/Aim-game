@@ -1,8 +1,10 @@
-import {getRandomArrayElement, getRandomNumber} from "./utils.js";
+import {getRandomArrayElement, getRandomNumber, isMorePoints} from "./utils.js";
 
 const INTERVAL_TIMEOUT = 1000;
 const MIN_CIRCLE_SIZE = 10;
 const MAX_CIRCLE_SIZE = 60;
+const MIN_USERNAME_LENGTH = 3;
+const MAX_USERNAME_LENGTH = 20;
 const CIRCLE_COLORS = [
   'linear-gradient(90deg, #16d9e3 0%, #30c7ec 47%, #46aef7 100%)',
   'linear-gradient(90deg, #de0c00 0%, #d62f24 47%, #ff6f65 100%)',
@@ -10,8 +12,6 @@ const CIRCLE_COLORS = [
   'linear-gradient(90deg, #ffe653 0%, #ffe53f 47%, #ffff00 100%)',
   'linear-gradient(90deg, #da83ff 0%, #ff24e5 47%, #ad00ff 100%)'
 ];
-const MIN_USERNAME_LENGTH = 3;
-const MAX_USERNAME_LENGTH = 20;
 
 const timer = document.querySelector('#time');
 const board = document.querySelector('#board');
@@ -21,7 +21,7 @@ let score = 0;
 let missClicks = 0;
 let circleDisappearTime = 1000;
 
-const createRandomCircle = () => {
+const createCircle = () => {
   const circle = document.createElement('div');
   const size = getRandomNumber(MIN_CIRCLE_SIZE, MAX_CIRCLE_SIZE);
   const {width, height} = board.getBoundingClientRect();
@@ -58,19 +58,25 @@ const decreaseTime = () => {
 const modeInput = document.querySelector('#no-misses');
 const handleMissClick = () => {
   removeCircle();
-  createRandomCircle();
+  createCircle();
   missClicks++;
+
+  if (modeInput.checked) {
+    finishGame();
+  }
 }
 
 let intervalId;
 let circleRemove;
 const startGame = () => {
+  board.addEventListener('click', onBoardClick);
+
   board.innerHTML = '';
   timerBlock.classList.remove('hidden');
   score = 0;
   missClicks = 0;
 
-  createRandomCircle();
+  createCircle();
   circleRemove = setInterval(handleMissClick, circleDisappearTime);
 
   if (time === 60) {
@@ -89,11 +95,7 @@ const leaderboardList = document.querySelector('.leaderboard__list');
 const addToLeaderboard = () => {
   leaderboardList.innerHTML = '';
 
-  if (scores.some(({name, points}) => {
-    if (name === nameInput.value && score > points) {
-      return true;
-    }
-  })) {
+  if (isMorePoints(nameInput.value, score, scores)) {
     const existingNameIndex = scores.findIndex(({name}) => name === nameInput.value);
     scores.splice(existingNameIndex, 1);
     scores.push({
@@ -117,9 +119,25 @@ const addToLeaderboard = () => {
   })
 };
 
+const onBoardClick = (evt) => {
+  if (evt.target.classList.contains('circle')) {
+    clearInterval(circleRemove);
+    circleRemove = setInterval(handleMissClick, circleDisappearTime);
+    score++;
+    removeCircle();
+    createCircle();
+  } else {
+    missClicks++;
+    if (modeInput.checked) {
+      finishGame();
+    }
+  }
+};
+
 const screens = document.querySelectorAll('.screen');
 const timerBlock = document.querySelector('.timer');
 const finishGame = () => {
+  board.removeEventListener('click', onBoardClick);
   addToLeaderboard();
   nameInput.value = '';
   timerBlock.classList.add('hidden');
@@ -131,13 +149,6 @@ const finishGame = () => {
     screens.forEach((screen) => screen.classList.remove('up'));
   }, 3000);
 };
-
-const startBtn = document.querySelector('#start');
-startBtn.addEventListener('click', (evt) => {
-  evt.preventDefault();
-  const menuScreen = document.querySelector('#menu-screen');
-  menuScreen.classList.add('up');
-});
 
 const timeList = document.querySelector('#time-list');
 const errorElement = document.querySelector('.error-text');
@@ -159,21 +170,6 @@ timeList.addEventListener('click', (evt) => {
   }
 });
 
-board.addEventListener('click', (evt) => {
-  if (evt.target.classList.contains('circle')) {
-    clearInterval(circleRemove);
-    circleRemove = setInterval(handleMissClick, circleDisappearTime);
-    score++;
-    removeCircle();
-    createRandomCircle();
-  } else {
-    missClicks++;
-    if (modeInput.checked) {
-      finishGame();
-    }
-  }
-});
-
 const speedRange = document.querySelector('.range-speed');
 const speedValue = document.querySelector('.range-speed-value');
 speedValue.textContent = speedRange.value;
@@ -181,4 +177,11 @@ speedValue.textContent = speedRange.value;
 speedRange.addEventListener('change', () => {
   circleDisappearTime = speedRange.value;
   speedValue.textContent = speedRange.value;
+});
+
+const startBtn = document.querySelector('#start');
+startBtn.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  const menuScreen = document.querySelector('#menu-screen');
+  menuScreen.classList.add('up');
 });
